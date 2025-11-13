@@ -6,7 +6,7 @@ services:
     container_name: minio-console-ingress
     restart: always
     ports:
-      - "9001:9001"
+      - "9000:9001"
     volumes:
       - ./nginx-console.conf:/etc/nginx/nginx.conf:ro
     depends_on:
@@ -21,7 +21,7 @@ services:
     container_name: minio-data-ingress
     restart: always
     ports:
-      - "9000:80"
+      - "9002:80"
     volumes:
       - ./nginx-data.conf:/etc/nginx/nginx.conf:ro
     depends_on:
@@ -42,8 +42,6 @@ services:
     expose:
       - "9000"
       - "9001"
-    volumes:
-      - minio1-data:/data
     environment:
       MINIO_ROOT_USER: minioadmin
       MINIO_ROOT_PASSWORD: minioadmin123
@@ -67,8 +65,6 @@ services:
     expose:
       - "9000"
       - "9001"
-    volumes:
-      - minio2-data:/data
     environment:
       MINIO_ROOT_USER: minioadmin
       MINIO_ROOT_PASSWORD: minioadmin123
@@ -92,8 +88,6 @@ services:
     expose:
       - "9000"
       - "9001"
-    volumes:
-      - minio3-data:/data
     environment:
       MINIO_ROOT_USER: minioadmin
       MINIO_ROOT_PASSWORD: minioadmin123
@@ -105,14 +99,6 @@ services:
       retries: 5
     networks:
       - minio-cluster
-
-volumes:
-  minio1-data:
-    driver: local
-  minio2-data:
-    driver: local
-  minio3-data:
-    driver: local
 
 networks:
   minio-cluster:
