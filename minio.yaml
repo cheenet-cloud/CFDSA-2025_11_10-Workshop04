@@ -1,0 +1,119 @@
+version: '3.8'
+
+services:
+  console-ingress:
+    image: nginx:alpine
+    container_name: minio-console-ingress
+    restart: always
+    ports:
+      - "9001:80"
+    volumes:
+      - ./nginx-console.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - minio1
+      - minio2
+      - minio3
+    networks:
+      - minio-cluster
+
+  data-ingress:
+    image: nginx:alpine
+    container_name: minio-data-ingress
+    restart: always
+    ports:
+      - "9000:80"
+    volumes:
+      - ./nginx-data.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - minio1
+      - minio2
+      - minio3
+    networks:
+      - minio-cluster
+
+  minio1:
+    image: minio/minio
+    hostname: minio1
+    container_name: minio1
+    restart: always
+    ports:
+      - "9011:9001"
+      - "9021:9002"
+    expose:
+      - "9000"
+      - "9001"
+    volumes:
+      - minio1-data:/data
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin123
+    command: server --console-address ":9001" --address ":9000" http://minio{1...3}/data
+    healthcheck:
+      test: ["CMD", "mc", "ready", "local"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - minio-cluster
+
+  minio2:
+    image: minio/minio
+    hostname: minio2
+    container_name: minio2
+    restart: always
+    ports:
+      - "9012:9001"
+      - "9022:9002"
+    expose:
+      - "9000"
+      - "9001"
+    volumes:
+      - minio2-data:/data
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin123
+    command: server --console-address ":9001" --address ":9000" http://minio{1...3}/data
+    healthcheck:
+      test: ["CMD", "mc", "ready", "local"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - minio-cluster
+
+  minio3:
+    image: minio/minio
+    hostname: minio3
+    container_name: minio3
+    restart: always
+    ports:
+      - "9013:9001"
+      - "9023:9002"
+    expose:
+      - "9000"
+      - "9001"
+    volumes:
+      - minio3-data:/data
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin123
+    command: server --console-address ":9001" --address ":9000" http://minio{1...3}/data
+    healthcheck:
+      test: ["CMD", "mc", "ready", "local"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - minio-cluster
+
+volumes:
+  minio1-data:
+    driver: local
+  minio2-data:
+    driver: local
+  minio3-data:
+    driver: local
+
+networks:
+  minio-cluster:
+    driver: bridge
