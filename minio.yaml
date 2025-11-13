@@ -6,7 +6,7 @@ services:
     container_name: minio-console-ingress
     restart: always
     ports:
-      - "9001:80"
+      - "9001:9001"
     volumes:
       - ./nginx-console.conf:/etc/nginx/nginx.conf:ro
     depends_on:
